@@ -275,7 +275,7 @@
        */
       var mouse = new Mouse(75, this.canvasElement);
 
-      var draw = setInterval(function() {
+      var draw = function() {
 
         that.canvasContext.clearRect(0, 0, that.width, that.height);
         for (var index = 0; index < bubbleArray.length; index++) {
@@ -317,7 +317,11 @@
         that.canvasContext.closePath();
         */
         resetBubbleQuadrant();
-      }, 10);
+
+        window.requestAnimationFrame(draw);
+      };
+
+      draw();
     };
   };
 
