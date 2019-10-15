@@ -1,6 +1,4 @@
-;
 (function() {
-
   /**
    * Compute a style value of a given element
    * @param  {Element} element [Target Div]
@@ -33,7 +31,7 @@
     var R = parseInt(Math.random() * 255);
     var G = parseInt(Math.random() * 255);
     var B = parseInt(Math.random() * 255);
-    var color = "rgb(" + R + "," + G + "," + B + ")";
+    var color = 'rgb(' + R + ',' + G + ',' + B + ')';
     return color;
   };
 
@@ -60,8 +58,6 @@
    * @param {Element} canvas [Canvas Element to be drawn in]
    */
   var Mouse = function(radius, canvas) {
-    var that = this;
-
     if (radius === undefined) {
       radius = 100;
     }
@@ -76,14 +72,14 @@
 
     this.init = function() {
       canvas.onmousemove = function(e) {
-        that.position.x = e.clientX - canvas.getBoundingClientRect().left;
-        that.position.y = e.clientY - canvas.getBoundingClientRect().top;
-        that.draw = true;
-      };
+        this.position.x = e.clientX - canvas.getBoundingClientRect().left;
+        this.position.y = e.clientY - canvas.getBoundingClientRect().top;
+        this.draw = true;
+      }.bind(this);
 
       canvas.onmouseout = function() {
-        that.draw = false;
-      };
+        this.draw = false;
+      }.bind(this);
     };
     this.init();
   };
@@ -96,21 +92,14 @@
    * @param {Int} angle    [Angle of bubble]
    */
   var Bubble = function(position, radius, speed, angle) {
-    var that = this;
-
-    if (position === undefined) position = {
-      x: 0,
-      y: 0
-    };
-    if (radius === undefined) {
-      radius = 10;
-    }
-    if (speed === undefined) {
-      speed = 5;
-    }
-    if (angle === undefined) {
-      angle = 45;
-    }
+    if (!position)
+      position = {
+        x: 0,
+        y: 0
+      };
+    if (!radius) radius = MIN_RADIUS;
+    if (!speed) speed = MIN_SPEED;
+    if (!angle) angle = MIN_ANGLE;
 
     this.position = position;
     this.radius = radius;
@@ -119,11 +108,11 @@
     this.angle = angle;
     this.velocity = 1;
 
-    this.xDirection = (Math.random() > 0.5) ? 1 : -1;
-    this.yDirection = (Math.random() > 0.5) ? 1 : -1;
+    this.xDirection = Math.random() > 0.5 ? 1 : -1;
+    this.yDirection = Math.random() > 0.5 ? 1 : -1;
 
     this.index = 0;
-    this.color = "none";
+    this.color = 'none';
     this.quadrant = [];
 
     this.move = function() {
@@ -169,8 +158,10 @@
           }
         }
       }
-      this.position.x += this.speed * this.xDirection * Math.cos(this.angle / 180 * Math.PI);
-      this.position.y += this.speed * this.yDirection * Math.sin(this.angle / 180 * Math.PI);
+      this.position.x +=
+        this.speed * this.xDirection * Math.cos((this.angle / 180) * Math.PI);
+      this.position.y +=
+        this.speed * this.yDirection * Math.sin((this.angle / 180) * Math.PI);
     };
 
     this.updateDirection = function(width, height) {
@@ -194,7 +185,17 @@
         var currentIndex = this.quadrant[index];
         if (currentIndex !== this.index) {
           var radius = this.radius + bubbleArray[currentIndex].radius;
-          var distance = Math.sqrt(Math.pow(this.position.x - bubbleArray[currentIndex].position.x, 2) + Math.pow(this.position.y - bubbleArray[currentIndex].position.y, 2), 2);
+          var distance = Math.sqrt(
+            Math.pow(
+              this.position.x - bubbleArray[currentIndex].position.x,
+              2
+            ) +
+              Math.pow(
+                this.position.y - bubbleArray[currentIndex].position.y,
+                2
+              ),
+            2
+          );
           if (distance <= radius) {
             this.xDirection *= -1;
             this.yDirection *= -1;
@@ -207,10 +208,15 @@
 
     this.antigravity = function(mouse) {
       if (mouse.draw) {
-        var radius = that.radius + mouse.radius;
-        var distance = Math.sqrt(Math.pow(this.position.x - mouse.position.x, 2) + Math.pow(this.position.y - mouse.position.y, 2), 2);
-        if (distance < (radius * 3)) {
-          this.speed = (radius * 3.25 - distance) / distance * this.initialSpeed;
+        var radius = this.radius + mouse.radius;
+        var distance = Math.sqrt(
+          Math.pow(this.position.x - mouse.position.x, 2) +
+            Math.pow(this.position.y - mouse.position.y, 2),
+          2
+        );
+        if (distance < radius * 3) {
+          this.speed =
+            ((radius * 3.25 - distance) / distance) * this.initialSpeed;
         } else {
           this.speed = this.initialSpeed;
         }
@@ -225,16 +231,14 @@
    * @param {Int} height [Height of canvas]
    */
   var Canvas = function(id, width, height) {
-    var that = this;
-
-    if (id === undefined) {
+    if (!id) {
       return;
     }
-    if (width === undefined) {
-      width = 500;
+    if (!width) {
+      width = WIDTH;
     }
-    if (height === undefined) {
-      height = 500;
+    if (!height) {
+      height = HEIGHT;
     }
 
     this.id = id;
@@ -246,23 +250,27 @@
 
     this.container = document.getElementById(id);
 
-    this.canvasElement = document.createElement("canvas");
-    this.canvasElement.setAttribute("width", this.width);
-    this.canvasElement.setAttribute("height", this.height);
+    this.canvasElement = document.createElement('canvas');
+    this.canvasElement.setAttribute('width', this.width);
+    this.canvasElement.setAttribute('height', this.height);
 
     this.container.appendChild(this.canvasElement);
 
     this.canvasContext = this.canvasElement.getContext('2d');
 
     this.init = function(count) {
+      if (!count) {
+        count = BALL_COUNT;
+      }
+
       for (var index = 0; index < count; index++) {
-        var radius = random(4, 8);
+        var radius = random(MIN_RADIUS, MAX_RADIUS);
         var center = {
           x: random(0 + radius, this.width - radius),
           y: random(0 + radius, this.height - radius)
         };
-        var speed = random(2, 4);
-        var angle = random(5, 85);
+        var speed = random(MIN_SPEED, MAX_SPEED);
+        var angle = random(MIN_ANGLE, MAX_ANGLE);
         var bubble = new Bubble(center, radius, speed, angle);
         bubble.index = index;
         bubble.color = getRandomColor();
@@ -273,53 +281,61 @@
        * New Instance of Mouse
        * @type {Mouse}
        */
-      var mouse = new Mouse(75, this.canvasElement);
+      var mouse = new Mouse(MOUSE_RADIUS, this.canvasElement);
 
       var draw = function() {
-
-        that.canvasContext.clearRect(0, 0, that.width, that.height);
+        this.canvasContext.clearRect(0, 0, this.width, this.height);
         for (var index = 0; index < bubbleArray.length; index++) {
           var currentBubble = bubbleArray[index];
-          that.canvasContext.beginPath();
-          that.canvasContext.arc(currentBubble.position.x, currentBubble.position.y, currentBubble.radius, 0, 2 * Math.PI, false);
-          that.canvasContext.fillStyle = currentBubble.color;
-          that.canvasContext.fill();
-          that.canvasContext.closePath();
+          this.canvasContext.beginPath();
+          this.canvasContext.arc(
+            currentBubble.position.x,
+            currentBubble.position.y,
+            currentBubble.radius,
+            0,
+            2 * Math.PI,
+            false
+          );
+          this.canvasContext.fillStyle = currentBubble.color;
+          this.canvasContext.fill();
+          this.canvasContext.closePath();
           currentBubble.move();
-          currentBubble.updateDirection(that.width, that.height);
+          currentBubble.updateDirection(this.width, this.height);
           currentBubble.collisionDetection();
           currentBubble.antigravity(mouse);
           currentBubble.quadrant = [];
         }
         if (mouse.draw) {
-          that.canvasContext.beginPath();
-          //that.canvasContext.arc(mouse.position.x, mouse.position.y, mouse.radius, 0, 2 * Math.PI, false);
-          that.canvasContext.lineWidth = 2;
-          that.canvasContext.strokeStyle = '#003300';
-          that.canvasContext.stroke();
-          that.canvasContext.closePath();
+          this.canvasContext.beginPath();
+          //this.canvasContext.arc(mouse.position.x, mouse.position.y, mouse.radius, 0, 2 * Math.PI, false);
+          this.canvasContext.lineWidth = 2;
+          this.canvasContext.strokeStyle = '#003300';
+          this.canvasContext.stroke();
+          this.canvasContext.closePath();
         }
         /*
-        that.canvasContext.beginPath();
-        that.canvasContext.lineWidth = 1;
-        that.canvasContext.strokeStyle = '#ccc';
-        that.canvasContext.moveTo(that.width / 2, 0);
-        that.canvasContext.lineTo(that.width / 2, that.height);
-        that.canvasContext.stroke();
-        that.canvasContext.closePath();
+        this.canvasContext.beginPath();
+        this.canvasContext.lineWidth = 1;
+        this.canvasContext.strokeStyle = '#ccc';
+        this.canvasContext.moveTo(this.width / 2, 0);
+        this.canvasContext.lineTo(this.width / 2, this.height);
+        this.canvasContext.stroke();
+        this.canvasContext.closePath();
 
-        that.canvasContext.beginPath();
-        that.canvasContext.lineWidth = 1;
-        that.canvasContext.strokeStyle = '#ccc';
-        that.canvasContext.moveTo(0, that.height / 2);
-        that.canvasContext.lineTo(that.width, that.height / 2);
-        that.canvasContext.stroke();
-        that.canvasContext.closePath();
+        this.canvasContext.beginPath();
+        this.canvasContext.lineWidth = 1;
+        this.canvasContext.strokeStyle = '#ccc';
+        this.canvasContext.moveTo(0, this.height / 2);
+        this.canvasContext.lineTo(this.width, this.height / 2);
+        this.canvasContext.stroke();
+        this.canvasContext.closePath();
         */
         resetBubbleQuadrant();
 
         window.requestAnimationFrame(draw);
       };
+
+      draw = draw.bind(this);
 
       draw();
     };
@@ -329,6 +345,6 @@
    * New Instance of Canvas
    * @type {Canvas}
    */
-  var canvas = new Canvas("container", 958, 600);
-  canvas.init(800);
+  var canvas = new Canvas('container', WIDTH, HEIGHT);
+  canvas.init(BALL_COUNT);
 })();
