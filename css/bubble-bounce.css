@@ -1,11 +1,12 @@
-#container{
-	width: 960px;
-	margin: 0 auto;
+body {
+	overflow: hidden;
 }
+
 #container canvas{
 	cursor : crosshair;
 	border: 1px solid #bbb;
 }
+
 .mouse-force-field{
 	display: none;
 	position: absolute;

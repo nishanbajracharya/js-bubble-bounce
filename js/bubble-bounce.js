@@ -134,13 +134,13 @@
 
     this.init = function(count) {
       for (var index = 0; index < count; index++) {
-        var radius = random(4, 8);
+        var radius = random(MIN_RADIUS, MAX_RADIUS);
         var center = {
           x: random(0 + radius, this.width - radius),
           y: random(0 + radius, this.height - radius)
         };
-        var speed = random(2, 4);
-        var angle = random(5, 85);
+        var speed = random(MIN_SPEED, MAX_SPEED);
+        var angle = random(MIN_ANGLE, MAX_ANGLE);
         var bubble = new Bubble(center, radius, speed, angle);
         bubble.index = index;
         bubble.color = getRandomColor();
@@ -180,6 +180,6 @@
     };
   };
 
-  var canvas = new Canvas("container", 958, 600);
-  canvas.init(800);
+  var canvas = new Canvas("container", WIDTH, HEIGHT);
+  canvas.init(BALL_COUNT);
 })();
