@@ -96,20 +96,13 @@
   var Bubble = function(position, radius, speed, angle) {
     var that = this;
 
-    if (position === undefined)
-      position = {
-        x: 0,
-        y: 0
-      };
-    if (radius === undefined) {
-      radius = 10;
-    }
-    if (speed === undefined) {
-      speed = 5;
-    }
-    if (angle === undefined) {
-      angle = 45;
-    }
+    if (!position) position = {
+      x: 0,
+      y: 0
+    };
+    if (!radius) radius = MIN_RADIUS;
+    if (!speed) speed = MIN_SPEED;
+    if (!angle) angle = MIN_ANGLE;
 
     this.position = position;
     this.radius = radius;
@@ -243,14 +236,14 @@
   var Canvas = function(id, width, height) {
     var that = this;
 
-    if (id === undefined) {
+    if (!id) {
       return;
     }
-    if (width === undefined) {
-      width = 500;
+    if (!width) {
+      width = WIDTH;
     }
-    if (height === undefined) {
-      height = 500;
+    if (!height) {
+      height = HEIGHT;
     }
 
     this.id = id;
@@ -272,7 +265,7 @@
 
     this.init = function(count) {
       if (!count) {
-        count = 100;
+        count = BALL_COUNT;
       }
 
       for (var index = 0; index < count; index++) {
@@ -293,7 +286,7 @@
        * New Instance of Mouse
        * @type {Mouse}
        */
-      var mouse = new Mouse(75, this.canvasElement);
+      var mouse = new Mouse(MOUSE_RADIUS, this.canvasElement);
 
       var draw = function() {
         that.canvasContext.clearRect(0, 0, that.width, that.height);

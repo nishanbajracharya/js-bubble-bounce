@@ -10,3 +10,5 @@ var MIN_ANGLE = 85;
 
 var MAX_RADIUS = 4;
 var MIN_RADIUS = 10;
+
+var MOUSE_RADIUS = 75;
